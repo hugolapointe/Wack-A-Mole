@@ -26,6 +26,11 @@ h1 {
     margin: 0px 10px;
 }
 
+#start.disabled {
+    color: black;
+    background-color: #DDDDDD;
+}
+
 header {
     display: grid;
     grid-gap: 10px;

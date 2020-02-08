@@ -15,6 +15,7 @@
     let total = 0;
     let countdown = GAME_TIME_MS;
 
+    let isRunning = false;
     let currMole = null;
     let prevMole = null;
 
@@ -28,8 +29,13 @@
     }
 
     function startGame() {
+        if(isRunning) return;
+        
+        isRunning = true;
         initGame();
         updateInfos();
+
+        START_BTN.addClass("disabled");
 
         setTimeout(() => peepRandomMole(), getRandomPeepTime());
         setTimeout(() => tick(), INFOS_UPDATE_INTERVAL_MS);
@@ -69,9 +75,7 @@
     }
 
     function wackMole() {
-        if (!$(this).is(currMole)) {
-            return;
-        }
+        if (!$(this).is(currMole)) return;
 
         hits++;
         $(this).removeClass("peeping")
@@ -84,13 +88,22 @@
 
         setTimeout(() => {
             if (countdown > 0) tick();
+            else endGame();
         }, INFOS_UPDATE_INTERVAL_MS);
     }
 
     function updateInfos() {
-        COUNTDOWN_LBL.text(`${(countdown / 1000).toFixed(2)} sec`);
+        let timeInSec = (countdown / 1000).toFixed(2);
+        let score = Math.round(hits / total * 100);
+
+        COUNTDOWN_LBL.text(`${timeInSec} sec`);
         RATIO_LBL.text(`${hits}/${total}`);
-        SCORE_LBL.text((total == 0) ? `-` : `${Math.round(hits / total * 100)}%`);
+        SCORE_LBL.text(isNaN(score) ? `-` : `${score}%`);
+    }
+
+    function endGame() {
+        isRunning = false;
+        START_BTN.removeClass("disabled");
     }
 
     initGame();
