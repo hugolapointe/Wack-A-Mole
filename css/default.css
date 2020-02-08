@@ -1,0 +1,118 @@
+﻿body {
+    display: flex;
+    font-family: Georgia;
+}
+
+main {
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 5em;
+    text-align: center;
+    margin: 10px 0px;
+}
+
+#start {
+    font-size: 2em;
+    color: white;
+    border: 1px solid black;
+    background-color: #555555;
+    width: 620px;
+    height: 50px;
+    margin: 0px 10px;
+}
+
+header {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 200px 200px 200px;
+    justify-content: center;
+    margin: 10px;
+    padding: 10px;
+}
+
+.box {
+    float: left;
+    border: 1px solid black;
+    padding: 10px 0px;
+}
+
+    .box span {
+        display: block;
+        width: 200px;
+        text-align: center;
+        font-size: 2em;
+    }
+
+        .box span:first-child {
+            font-weight: bold;
+        }
+
+#board {
+    background-color: lightgray;
+    border: 1px solid black;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 200px 200px 200px;
+    margin: 10px;
+    padding: 10px;
+    justify-content: center;
+}
+
+.hole {
+    border: 1px dashed darkgray;
+    width: 200px;
+    height: 180px;
+    overflow: hidden;
+}
+
+.dirt {
+    background: url("../img/dirt.png") bottom center no-repeat;
+    background-size: contain;
+    width: 200px;
+    height: 39px;
+    position: relative;
+    bottom: -141px;
+    z-index: 2;
+}
+
+.mole {
+    background: url("../img/mole.png") bottom center no-repeat;
+    background-size: 80%;
+    width: 96px;
+    height: 72px;
+    margin: 0px auto;
+    position: relative;
+    bottom: -112px;
+    z-index: 1;
+    transition: bottom 0.5s ease;
+}
+
+    .mole.peeping {
+        bottom: -50px;
+        transition: bottom 0.5s ease;
+    }
+
+    .mole.bonked {
+        animation-duration: 0.5s;
+        animation-name: shake;
+        animation-fill-mode: both;
+    }
+
+@keyframes shake {
+    from, to {
+        transform: translate3d(0, 0, 0);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translate3d(-10px, 0, 0);
+    }
+
+    20%, 40%, 60%, 80% {
+        transform: translate3d(10px, 0, 0);
+    }
+}
