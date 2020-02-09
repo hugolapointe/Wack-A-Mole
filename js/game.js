@@ -1,7 +1,7 @@
-﻿$(document).ready(function () {
+﻿$("#game").ready(function () {
 
     const GAME_TIME_MS = 30000;
-    const INFOS_UPDATE_INTERVAL_MS = 500;
+    const TICK_INTERVAL_MS = 500;
     const PEEP_TIME_MIN_MS = 750;
     const PEEP_TIME_MAX_MS = 1500;
 
@@ -14,13 +14,12 @@
     let hits = 0;
     let total = 0;
     let countdown = GAME_TIME_MS;
-
     let isRunning = false;
     let currMole = null;
-    let prevMole = null;
+    let tickInterval = null
 
     START_BTN.click(startGame);
-    MOLE_OBJS.click(wackMole);
+    MOLE_OBJS.click(wackCurrMole);
 
     function initGame() {
         hits = 0;
@@ -29,7 +28,9 @@
     }
 
     function startGame() {
-        if(isRunning) return;
+        if(isRunning) {
+            return;
+        }
         
         isRunning = true;
         initGame();
@@ -37,45 +38,47 @@
 
         START_BTN.addClass("disabled");
 
-        setTimeout(() => peepRandomMole(), getRandomPeepTime());
-        setTimeout(() => tick(), INFOS_UPDATE_INTERVAL_MS);
+        peepRandomMole();
+        tickInterval = setInterval(() => tick(), TICK_INTERVAL_MS);
     }
 
     function peepRandomMole() {
-        nextRandomMole();
+        currMole = getRandomMole();
 
         total++;
         currMole.removeClass("bonked")
                 .addClass("peeping");
 
-        peepTimer = setTimeout(() => {
-            currMole.removeClass("peeping");
+        setTimeout(() => {
+            hideCurrMole();
 
-            if (countdown > 0) peepRandomMole();
+            if (isRunning) {
+                peepRandomMole();
+            }
         }, getRandomPeepTime());
     }
 
-    function nextRandomMole() {
-        do {
-            currMole = getRandomMole();
-        } while (currMole.is(prevMole));
-        prevMole = currMole;
+    function getRandomMole() {
+        return MOLE_OBJS.not(currMole)
+                        .eq(getRandom(0, MOLE_OBJS.length - 1));
+    }
+
+    function getRandomPeepTime() {
+        return Math.min(getRandom(PEEP_TIME_MIN_MS, PEEP_TIME_MAX_MS), countdown);
     }
 
     function getRandom(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
     }
 
-    function getRandomMole() {
-        return MOLE_OBJS.eq(getRandom(0, MOLE_OBJS.length));
+    function hideCurrMole() {
+        currMole.removeClass("peeping");
     }
 
-    function getRandomPeepTime() {
-        return getRandom(PEEP_TIME_MIN_MS, PEEP_TIME_MAX_MS);
-    }
-
-    function wackMole() {
-        if (!$(this).is(currMole)) return;
+    function wackCurrMole() {
+        if (!$(this).is(currMole)) {
+            return;
+        }
 
         hits++;
         $(this).removeClass("peeping")
@@ -83,15 +86,14 @@
     }
 
     function tick() {
-        countdown -= INFOS_UPDATE_INTERVAL_MS;
+        countdown -= TICK_INTERVAL_MS;
         updateInfos();
 
-        setTimeout(() => {
-            if (countdown > 0) tick();
-            else endGame();
-        }, INFOS_UPDATE_INTERVAL_MS);
+        if(countdown <= 0) {
+            endGame();    
+        }
     }
-
+    
     function updateInfos() {
         let timeInSec = (countdown / 1000).toFixed(2);
         let score = Math.round(hits / total * 100);
@@ -100,12 +102,13 @@
         RATIO_LBL.text(`${hits}/${total}`);
         SCORE_LBL.text(isNaN(score) ? `-` : `${score}%`);
     }
-
+    
     function endGame() {
+        clearInterval(tickInterval);
         isRunning = false;
         START_BTN.removeClass("disabled");
     }
-
+    
     initGame();
     updateInfos();
 });
